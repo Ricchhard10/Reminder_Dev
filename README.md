@@ -72,7 +72,7 @@ Reminder Dev solicita permiso de notificaciones cuando necesita programar el pri
 
 Los recordatorios nuevos son genéricos: no muestran el nombre, la nota ni el importe en la pantalla bloqueada. No se solicitan tokens y no se usa un servicio de notificaciones push remotas.
 
-Expo Go puede mostrar advertencias generales sobre limitaciones de `expo-notifications` aunque la app utilice recordatorios locales. Para validar el comportamiento de una versión distribuible, utiliza una [development build](https://docs.expo.dev/develop/development-builds/introduction/) y después prueba una compilación de producción en dispositivos reales.
+En Android + Expo Go, la agenda y la base local funcionan para pruebas, pero Reminder Dev no carga el módulo de notificaciones. Esto evita el error de inicio provocado por las funciones push que Expo Go retiró. Los avisos se activan automáticamente en una [development build](https://docs.expo.dev/develop/development-builds/introduction/) o compilación propia. Valida siempre el comportamiento final en dispositivos reales.
 
 ## Comprobaciones
 

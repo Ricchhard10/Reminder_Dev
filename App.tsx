@@ -1,8 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
+import { isRunningInExpoGo } from 'expo';
 import { useFonts } from 'expo-font';
 import { PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
 import { VT323_400Regular } from '@expo-google-fonts/vt323';
-import * as Notifications from 'expo-notifications';
 import { SQLiteProvider, type SQLiteDatabase, useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
@@ -53,14 +53,25 @@ const MONO = 'VT323_400Regular';
 const categories = ['SUSCRIPCIÓN', 'TARJETA', 'VEHÍCULO', 'SERVICIO', 'OTRO'];
 const frequencies = ['MENSUAL', 'ANUAL', 'ÚNICO'];
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+const notificationsUnavailableInExpoGo = Platform.OS === 'android' && isRunningInExpoGo();
+type NotificationsModule = typeof import('expo-notifications');
+let notificationsPromise: Promise<NotificationsModule> | null = null;
+
+async function loadNotifications() {
+  if (notificationsUnavailableInExpoGo) return null;
+  notificationsPromise ??= import('expo-notifications').then((notifications) => {
+    notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+        shouldShowBanner: true,
+        shouldShowList: true,
+      }),
+    });
+    return notifications;
+  });
+  return notificationsPromise;
+}
 
 const todayText = () => {
   const today = new Date();
@@ -99,7 +110,8 @@ async function migrateDatabase(db: SQLiteDatabase) {
 async function cancelReminder(notificationId: string) {
   if (!notificationId) return;
   try {
-    await Notifications.cancelScheduledNotificationAsync(notificationId);
+    const Notifications = await loadNotifications();
+    await Notifications?.cancelScheduledNotificationAsync(notificationId);
   } catch {
     // El pago se conserva aunque el sistema ya haya retirado la notificación.
   }
@@ -111,6 +123,9 @@ async function scheduleReminder(dueDate: string) {
   if (reminderDate.getTime() <= Date.now()) return '';
 
   try {
+    const Notifications = await loadNotifications();
+    if (!Notifications) return '';
+
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('bugdev-pagos', {
         name: 'Recordatorios de pagos',
@@ -390,6 +405,9 @@ function PaymentsScreen() {
           <Text style={styles.privacyIcon}>▣</Text>
           <View style={styles.privacyCopy}>
             <Text style={styles.privacyText}>Los datos y recordatorios permanecen en este dispositivo.</Text>
+            {notificationsUnavailableInExpoGo && (
+              <Text style={styles.previewNotice}>MODO DE PRUEBA · LOS AVISOS SE ACTIVAN EN UNA DEVELOPMENT BUILD.</Text>
+            )}
           </View>
         </View>
         <Text style={styles.footer}>BUG DEV · TU AGENDA LOCAL DE PAGOS</Text>
@@ -584,6 +602,7 @@ const styles = StyleSheet.create({
   privacyIcon: { color: COLORS.green, fontSize: 26 },
   privacyCopy: { flex: 1 },
   privacyText: { color: COLORS.muted, fontFamily: MONO, fontSize: 20, lineHeight: 23 },
+  previewNotice: { color: COLORS.yellow, fontFamily: MONO, fontSize: 16, lineHeight: 19, marginTop: 9 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 18 },
   chip: { minHeight: 44, justifyContent: 'center', borderWidth: 1, borderColor: COLORS.line, paddingHorizontal: 12, paddingVertical: 9, backgroundColor: COLORS.ink },
   chipActive: { borderColor: COLORS.yellow, borderBottomWidth: 3, backgroundColor: COLORS.panelSoft },
