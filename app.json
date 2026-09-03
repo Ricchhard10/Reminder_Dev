@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "Reminder Dev",
+    "slug": "bugdev-pagos",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon-arcade.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/icon-arcade.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bugdevsv.pagos"
+    },
+    "android": {
+      "package": "com.bugdevsv.pagos",
+      "predictiveBackGestureEnabled": false,
+      "blockedPermissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/icon-arcade.png"
+    },
+    "plugins": [
+      "expo-sqlite",
+      [
+        "expo-notifications",
+        {
+          "color": "#FF5050"
+        }
+      ],
+      "expo-font"
+    ]
+  }
+}

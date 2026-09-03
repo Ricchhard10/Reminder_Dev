@@ -1,0 +1,34 @@
+{
+  "name": "sistema-costos",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "@expo-google-fonts/press-start-2p": "^0.4.1",
+    "@expo-google-fonts/vt323": "^0.4.1",
+    "expo": "~57.0.19",
+    "expo-font": "~57.0.3",
+    "expo-notifications": "~57.0.16",
+    "expo-sqlite": "~57.0.2",
+    "expo-status-bar": "~57.0.1",
+    "react": "19.2.3",
+    "react-native": "0.86.3"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "start:local": "expo start --localhost",
+    "typecheck": "tsc --noEmit",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "overrides": {
+    "xcode": {
+      "uuid": "11.1.1"
+    }
+  },
+  "private": true
+}
